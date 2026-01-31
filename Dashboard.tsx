@@ -1,6 +1,5 @@
-
-import React from 'react';
-import { TaskLog, AnalysisResult } from './types';
+import React, { useEffect, useMemo, useState } from "react";
+import { TaskLog, AnalysisResult } from "./types";
 
 interface DashboardProps {
   logs: TaskLog[];
@@ -9,9 +8,60 @@ interface DashboardProps {
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ logs, analysis, isAdmin }) => {
-  const totalTasks = logs.length;
-  const completed = logs.filter(l => l.status === 'Completed').length;
-  const blocked = logs.filter(l => l.status === 'Blocked').length;
+  type Stats = { done: number; pending: number; blocked: number };
+
+  const [sheetStats, setSheetStats] = useState<Stats | null>(null);
+  const [statsError, setStatsError] = useState<string>("");
+
+  useEffect(() => {
+    let alive = true;
+
+    fetch("/api/stats")
+      .then((r) => r.json())
+      .then((data) => {
+        if (!alive) return;
+
+        if (!data?.success) {
+          setStatsError(data?.error || "Failed to load stats");
+          setSheetStats(null);
+          return;
+        }
+
+        setStatsError("");
+        setSheetStats({
+          done: Number(data.done || 0),
+          pending: Number(data.pending || 0),
+          blocked: Number(data.blocked || 0),
+        });
+      })
+      .catch(() => {
+        if (!alive) return;
+        setStatsError("Network error loading stats");
+        setSheetStats(null);
+      });
+
+    return () => {
+      alive = false;
+    };
+  }, []);
+  // local fallback (from logs)
+  const localCompleted = useMemo(
+    () => logs.filter((l) => l.status === "Completed").length,
+    [logs]
+  );
+  const localBlocked = useMemo(
+    () => logs.filter((l) => l.status === "Blocked").length,
+    [logs]
+  );
+  const localTotal = logs.length;
+  const localPending = localTotal - localCompleted;
+
+  // prefer sheet stats when available
+  const completed = sheetStats?.done ?? localCompleted;
+  const blocked = sheetStats?.blocked ?? localBlocked;
+  const pending = sheetStats?.pending ?? localPending;
+  const totalTasks = sheetStats ? completed + pending + blocked : localTotal;
+
   
   // Calculate activity trend (Last 7 days)
   const getLast7Days = () => {
@@ -44,7 +94,7 @@ const Dashboard: React.FC<DashboardProps> = ({ logs, analysis, isAdmin }) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard label={isAdmin ? "Total Team updates" : "My Total Updates"} value={totalTasks} color="indigo" />
         <StatCard label="Success Mark" value={completed} color="emerald" suffix=" Done" />
-        <StatCard label="Pending" value={totalTasks - completed} color="amber" />
+        <StatCard label="Pending" value={pending} color="amber" />
         <StatCard label="Blocked" value={blocked} color="rose" />
       </div>
 
@@ -144,6 +194,14 @@ const StatCard = ({ label, value, color, suffix = "" }: { label: string, value: 
       <p className="text-[10px] font-black uppercase tracking-[0.2em] mb-2 opacity-70">{label}</p>
       <p className="text-4xl font-black font-mono">{value}{suffix}</p>
     </div>
+          {statsError ? (
+        <p className="text-xs text-rose-400 font-bold">Stats API: {statsError} (showing local logs)</p>
+      ) : sheetStats ? (
+        <p className="text-xs text-emerald-400 font-bold">Stats API: live (Google Sheet)</p>
+      ) : (
+        <p className="text-xs text-slate-500 font-bold">Stats API: loading…</p>
+      )}
+
   );
 };
 
