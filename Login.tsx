@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { User, TEAM_MEMBERS } from '../types';
+import { User, TEAM_MEMBERS } from './types';
 
 interface LoginProps {
   onLogin: (user: User) => void;
