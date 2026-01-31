@@ -1,16 +1,19 @@
 export default async function handler(req: any, res: any) {
   try {
-    const url =
-      "https://script.google.com/macros/s/AKfycbweSIGtdsPRPBchCCMC31Bv_LDgrLTBpjafrLwbPTsemRRwBFrOnJgXtr-RmLCzIgPC/exec?action=stats&key=MNJ_SUPER_SECRET_123456789";
+    const GAS_URL = process.env.GAS_URL;
+    const MNJ_KEY = process.env.MNJ_KEY;
 
-    const response = await fetch(url);
-    const data = await response.json();
+    if (!GAS_URL || !MNJ_KEY) {
+      return res.status(500).json({ success: false, error: "Missing env vars" });
+    }
 
-    res.status(200).json(data);
+    const url = `${GAS_URL}?action=stats&key=${encodeURIComponent(MNJ_KEY)}`;
+
+    const r = await fetch(url);
+    const data = await r.json();
+
+    return res.status(200).json(data);
   } catch (err: any) {
-    res.status(500).json({
-      success: false,
-      error: err.message || "Server error",
-    });
+    return res.status(500).json({ success: false, error: String(err?.message || err) });
   }
 }
