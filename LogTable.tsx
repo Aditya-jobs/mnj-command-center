@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { TaskLog } from '../types';
+import { TaskLog } from './types';
 
 interface LogTableProps {
   logs: TaskLog[];
