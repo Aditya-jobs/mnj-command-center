@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { TaskLog, AnalysisResult } from '../types';
+import { TaskLog, AnalysisResult } from './types';
 
 interface DashboardProps {
   logs: TaskLog[];
