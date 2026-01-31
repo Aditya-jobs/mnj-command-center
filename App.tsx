@@ -1,14 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, TaskLog, AnalysisResult, User, TEAM_MEMBERS, ChatMessage, Assignment } from './types';
-import LogForm from './components/LogForm';
-import LogTable from './components/LogTable';
-import Dashboard from './components/Dashboard';
-import GASConfig from './components/GASConfig';
-import Login from './components/Login';
-import Chat from './components/Chat';
-import Directives from './components/Directives';
-import { analyzeTeamPerformance } from './services/geminiService';
+import LogForm from './LogForm';
+import LogTable from './LogTable';
+import Dashboard from './Dashboard';
+import GASConfig from './GASConfig';
+import Login from './Login';
+import Chat from './Chat';
+import Directives from './Directives';
+import { analyzeTeamPerformance } from './geminiService';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
