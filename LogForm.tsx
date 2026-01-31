@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { TaskLog, User, TEAM_MEMBERS, Category } from '../types';
+import { TaskLog, User, TEAM_MEMBERS, Category } from './types';
 
 interface LogFormProps {
   currentUser: User;
