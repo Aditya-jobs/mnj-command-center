@@ -195,15 +195,22 @@ const StatCard = ({ label, value, color, suffix = "" }: { label: string, value: 
       <p className="text-4xl font-black font-mono">{value}{suffix}</p>
     </div>
 <div className="mt-4">
-  {statsError ? (
-    <p className="text-xs text-rose-400 font-bold">
-      Stats API: {statsError} (showing local logs)
-    </p>
-  ) : sheetStats ? (
-    <p className="text-xs text-emerald-400 font-bold">
-      Stats API: live (Google Sheet)
-    </p>
-  ) : (
+{statsError ? (
+  <p className="text-xs text-rose-400 font-bold">
+    Stats API: {statsError} (showing local logs)
+  </p>
+) : sheetStats ? (
+  <SomeComponent />
+) : null}
+{statsError && (
+  <p className="text-xs text-rose-400 font-bold">
+    Stats API: {statsError} (showing local logs)
+  </p>
+)}
+
+{!statsError && sheetStats && (
+  <SomeComponent />
+)}
     <p className="text-xs text-slate-500 font-bold">Stats API: loading…</p>
   )}
 </div>
