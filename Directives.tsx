@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Assignment, User, TEAM_MEMBERS } from '../types';
+import { Assignment, User, TEAM_MEMBERS } from './types';
 
 interface DirectivesProps {
   isAdmin: boolean;
